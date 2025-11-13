@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Excel Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/animations.css}">
+    <style>
+        .upload-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--primary-gradient);
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .upload-page::before {
+            content: '';
+            position: absolute;
+            width: 2000px;
+            height: 2000px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            top: -1000px;
+            right: -1000px;
+            animation: float 15s infinite linear;
+            z-index: 0;
+        }
+
+        .upload-page::after {
+            content: '';
+            position: absolute;
+            width: 1500px;
+            height: 1500px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            bottom: -750px;
+            left: -750px;
+            animation: float 20s infinite linear reverse;
+            z-index: 0;
+        }
+
+        .upload-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+            margin: auto;
+        }
+
+        .upload-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .upload-card:hover::before {
+            left: 100%;
+        }
+
+        .upload-title {
+            font-size: 2.2rem;
+            color: #fff;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .upload-title::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-color);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 3px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            position: relative;
+            text-align: left;
+            animation: fadeIn 0.5s ease, slideInUp 0.5s ease;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .form-group select option {
+            background: #5a67d8;
+            color: white;
+        }
+
+        .file-upload {
+            position: relative;
+            margin-top: 1rem;
+            grid-column: 1 / -1;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            display: none;
+        }
+
+        .upload-button {
+            width: 100%;
+            max-width: 300px;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin: 1rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .upload-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .upload-button:hover::before {
+            left: 100%;
+        }
+
+        .upload-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .success-message {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin: 0;
+            font-weight: 500;
+            display: block;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .error-message {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ffeb3b;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin: 0;
+            font-weight: 500;
+            display: block;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-3px);
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .logout-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        @media (max-width: 768px) {
+            .upload-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .upload-title {
+                font-size: 1.8rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="upload-page" style="height: 100%; overflow-y: auto;">
+    <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <a href="/logout" class="logout-button">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+
+    <div class="upload-card">
+        <h1 class="upload-title"><i class="fas fa-file-excel"></i> Upload Excel Results</h1>
+
+        <form id="uploadForm" method="post" action="/excel/upload" enctype="multipart/form-data" class="upload-form" onsubmit="submitForm(event)">
+            <!-- Message Display - At top of form -->
+            <div class="message-container" style="min-height: 0; margin-bottom: 1rem; position: relative; z-index: 10;">
+                <!-- Messages will be added here dynamically via JavaScript -->
+            </div>
+
+            <div class="form-grid">
+                <!-- College Input -->
+                <div class="form-group animate-slide-up" style="animation-delay: 0.1s;">
+                    <label for="college">College Name</label>
+                    <input type="text" id="college" name="college" placeholder="e.g., SRKIT" th:value="${college}" required>
+                </div>
+
+                <!-- Department -->
+                <div class="form-group animate-slide-up" style="animation-delay: 0.2s;">
+                    <label for="mainDept">Department</label>
+                    <select id="mainDept" name="mainDept" onchange="toggleSubDept()" required>
+                        <option value="" disabled th:selected="${mainDept == null}">Select Department</option>
+                        <option value="CS" th:selected="${mainDept == 'CS'}">CS</option>
+                        <option value="ECE" th:selected="${mainDept == 'ECE'}">ECE</option>
+                        <option value="EEE" th:selected="${mainDept == 'EEE'}">EEE</option>
+                        <option value="MECH" th:selected="${mainDept == 'MECH'}">MECH</option>
+                        <option value="IT" th:selected="${mainDept == 'IT'}">IT</option>
+                        <option value="CIVIL" th:selected="${mainDept == 'CIVIL'}">CIVIL</option>
+                    </select>
+                </div>
+
+                <!-- Sub-Department -->
+                <div class="form-group animate-slide-up" id="subDeptDiv" style="display: none; animation-delay: 0.3s;">
+                    <label for="subDept">Sub-Department</label>
+                    <select id="subDept" name="subDept">
+                        <option value="" disabled th:selected="${subDept == null}">Select Sub-Dept</option>
+                        <option value="CSE" th:selected="${subDept == 'CSE'}">CSE</option>
+                        <option value="CSD" th:selected="${subDept == 'CSD'}">CSD</option>
+                        <option value="CSM" th:selected="${subDept == 'CSM'}">CSM</option>
+                    </select>
+                </div>
+
+                <!-- Semester -->
+                <div class="form-group animate-slide-up" style="animation-delay: 0.3s;">
+                    <label for="semester">Semester</label>
+                    <select id="semester" name="semester" required>
+                        <option value="" disabled th:selected="${semester == null}">Select Semester</option>
+                        <option value="1-1" th:selected="${semester == '1-1'}">1-1</option>
+                        <option value="1-2" th:selected="${semester == '1-2'}">1-2</option>
+                        <option value="2-1" th:selected="${semester == '2-1'}">2-1</option>
+                        <option value="2-2" th:selected="${semester == '2-2'}">2-2</option>
+                        <option value="3-1" th:selected="${semester == '3-1'}">3-1</option>
+                        <option value="3-2" th:selected="${semester == '3-2'}">3-2</option>
+                        <option value="4-1" th:selected="${semester == '4-1'}">4-1</option>
+                        <option value="4-2" th:selected="${semester == '4-2'}">4-2</option>
+                    </select>
+                </div>
+
+                <!-- Exam Type -->
+                <div class="form-group animate-slide-up" style="animation-delay: 0.4s;">
+                    <label for="type">Exam Type</label>
+                    <select id="type" name="type" required>
+                        <option value="regular" th:selected="${type == null || type == 'regular'}">Regular</option>
+                        <option value="supplementary" th:selected="${type == 'supplementary'}">Supplementary</option>
+                    </select>
+                </div>
+
+                <!-- File Upload -->
+                <div class="file-upload animate-slide-up" style="animation-delay: 0.5s;">
+                    <label for="file" class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                        <span class="file-upload-text">Drag & drop your Excel file here or click to browse</span>
+                        <span id="file-name" class="file-name"></span>
+                    </label>
+                    <input type="file" id="file" name="file" class="file-upload-input" accept=".xlsx" required>
+                </div>
+            </div>
+
+            <!-- Upload Button -->
+            <button type="submit" class="upload-button animate-slide-up" style="animation-delay: 0.6s;">
+                <i class="fas fa-upload"></i> Upload Results
+            </button>
+
+
+        </form>
+    </div>
+
+    <script th:src="@{/js/animations.js}"></script>
+    <script>
+        // Toggle Sub-Department based on Main Department selection
+        function toggleSubDept() {
+            const mainDept = document.getElementById("mainDept").value;
+            const subDeptDiv = document.getElementById("subDeptDiv");
+
+            if (mainDept === "CS") {
+                subDeptDiv.style.display = "block";
+                subDeptDiv.classList.add('animate-fade-in');
+            } else {
+                subDeptDiv.style.display = "none";
+            }
+        }
+
+        // Display file name when file is selected
+        document.getElementById("file").addEventListener("change", function() {
+            const fileName = this.files[0] ? this.files[0].name : "";
+            const fileNameElement = document.getElementById("file-name");
+
+            if (fileName) {
+                fileNameElement.textContent = "Selected file: " + fileName;
+                fileNameElement.style.display = "block";
+                document.querySelector(".file-upload-icon").style.color = "var(--accent-color)";
+            } else {
+                fileNameElement.style.display = "none";
+                document.querySelector(".file-upload-icon").style.color = "rgba(255, 255, 255, 0.7)";
+            }
+        });
+
+        // Add drag and drop functionality
+        const dropArea = document.querySelector(".file-upload-label");
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.classList.add('hover-glow');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('hover-glow');
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('file').files = files;
+
+            // Trigger change event to update file name display
+            const event = new Event('change');
+            document.getElementById('file').dispatchEvent(event);
+        }
+
+        // Function to display a message
+        function displayMessage(message, isSuccess) {
+            // Clear any existing messages
+            const messageContainer = document.querySelector('.message-container');
+            messageContainer.innerHTML = '';
+
+            // Create the message element
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            messageDiv.className = isSuccess ? 'success-message' : 'error-message';
+
+            // Add the message to the container
+            messageContainer.appendChild(messageDiv);
+
+            // Scroll to the message container smoothly
+            setTimeout(() => {
+                const formTop = document.querySelector('.upload-form').getBoundingClientRect().top;
+                window.scrollTo({
+                    top: window.scrollY + formTop - 20,
+                    behavior: 'smooth'
+                });
+            }, 100);
+
+            return messageDiv;
+        }
+
+        // Function to handle form submission via AJAX
+        function submitForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Check if the form is valid
+            const form = document.getElementById('uploadForm');
+            if (!form.checkValidity()) {
+                // If the form is not valid, trigger the browser's validation UI
+                form.reportValidity();
+                return;
+            }
+
+            // Show loading state
+            const uploadButton = document.querySelector('.upload-button');
+            const originalButtonText = uploadButton.innerHTML;
+            uploadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            uploadButton.disabled = true;
+
+            // Show a loading message
+            displayMessage('Uploading file... Please wait.', true);
+
+            // Get form data
+            const formData = new FormData(document.getElementById('uploadForm'));
+
+            // Send AJAX request
+            fetch('/excel/upload-ajax', {
+                method: 'POST',
+                body: formData,
+                // Don't set Content-Type header, let the browser set it with the boundary parameter
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display the message
+                displayMessage(data.message, data.status === 'success');
+
+                // Reset the button
+                uploadButton.innerHTML = originalButtonText;
+                uploadButton.disabled = false;
+
+                // Reset the file input if upload was successful
+                if (data.status === 'success') {
+                    document.getElementById('file').value = '';
+                    document.getElementById('file-name').style.display = 'none';
+                    document.querySelector('.file-upload-icon').style.color = 'rgba(255, 255, 255, 0.7)';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+                // Display error message
+                displayMessage('❌ An error occurred while uploading. Please try again.', false);
+
+                // Reset the button
+                uploadButton.innerHTML = originalButtonText;
+                uploadButton.disabled = false;
+            });
+        }
+
+        // Add staggered animations to form elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clear any existing messages
+            const messageContainers = document.querySelectorAll('.message-container');
+            messageContainers.forEach(container => {
+                container.innerHTML = '';
+            });
+
+            const formElements = document.querySelectorAll('.animate-slide-up');
+            formElements.forEach((el, index) => {
+                el.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+            });
+
+            // Show subDept div if CS is selected when the page loads
+            toggleSubDept();
+
+            // Ensure the page is scrollable
+            document.body.style.height = 'auto';
+            document.body.style.minHeight = '100vh';
+        });
+    </script>
+</body>
+</html>

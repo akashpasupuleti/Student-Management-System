@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fixed Search Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .results {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Search</h1>
+        
+        <div class="form-group">
+            <label for="department">Department:</label>
+            <select id="department">
+                <option value="">Select Department</option>
+                <option value="CS">Computer Science</option>
+                <option value="ECE">Electronics</option>
+                <option value="MECH">Mechanical</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="semester">Semester:</label>
+            <select id="semester">
+                <option value="">Select Semester</option>
+                <option value="1-1">1-1</option>
+                <option value="1-2">1-2</option>
+                <option value="2-1">2-1</option>
+                <option value="2-2">2-2</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="searchType">Search By:</label>
+            <select id="searchType" onchange="toggleSearchFields()">
+                <option value="roll">Roll Number</option>
+                <option value="subject">Subject</option>
+            </select>
+        </div>
+        
+        <div id="rollSearch" class="form-group">
+            <label for="rollNumber">Roll Number:</label>
+            <input type="text" id="rollNumber" placeholder="Enter Roll Number">
+        </div>
+        
+        <div id="subjectSearch" class="form-group" style="display:none;">
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" placeholder="Enter Subject Name">
+            
+            <div style="margin-top: 10px;">
+                <label>Grade:</label>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <button type="button" onclick="selectGrade('A')">A</button>
+                    <button type="button" onclick="selectGrade('B')">B</button>
+                    <button type="button" onclick="selectGrade('C')">C</button>
+                    <button type="button" onclick="selectGrade('D')">D</button>
+                    <button type="button" onclick="selectGrade('F')">F</button>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="search()">Search</button>
+        
+        <div id="results" class="results" style="display:none;">
+            <h2>Search Results</h2>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Roll Number</th>
+                        <th>Subject</th>
+                        <th>Grade</th>
+                        <th>Internal Marks</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <!-- Results will be added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let selectedGrade = null;
+        
+        function toggleSearchFields() {
+            const searchType = document.getElementById('searchType').value;
+            
+            if (searchType === 'roll') {
+                document.getElementById('rollSearch').style.display = 'block';
+                document.getElementById('subjectSearch').style.display = 'none';
+            } else {
+                document.getElementById('rollSearch').style.display = 'none';
+                document.getElementById('subjectSearch').style.display = 'block';
+            }
+        }
+        
+        function selectGrade(grade) {
+            selectedGrade = grade;
+            
+            // Highlight the selected grade button
+            const buttons = document.querySelectorAll('#subjectSearch button');
+            buttons.forEach(button => {
+                if (button.textContent === grade) {
+                    button.style.backgroundColor = '#45a049';
+                } else {
+                    button.style.backgroundColor = '#4CAF50';
+                }
+            });
+        }
+        
+        function search() {
+            const department = document.getElementById('department').value;
+            const semester = document.getElementById('semester').value;
+            const searchType = document.getElementById('searchType').value;
+            
+            if (!department || !semester) {
+                alert('Please select department and semester');
+                return;
+            }
+            
+            if (searchType === 'roll') {
+                const rollNumber = document.getElementById('rollNumber').value;
+                if (!rollNumber) {
+                    alert('Please enter a roll number');
+                    return;
+                }
+                
+                // In a real application, you would make an API call here
+                // For this demo, we'll just show some sample data
+                showResults([
+                    { rollNumber: rollNumber, subject: 'Mathematics', grade: 'A', internalMarks: 25 },
+                    { rollNumber: rollNumber, subject: 'Physics', grade: 'B', internalMarks: 22 },
+                    { rollNumber: rollNumber, subject: 'Chemistry', grade: 'A', internalMarks: 24 }
+                ]);
+            } else {
+                const subject = document.getElementById('subject').value;
+                if (!subject) {
+                    alert('Please enter a subject');
+                    return;
+                }
+                
+                if (!selectedGrade) {
+                    alert('Please select a grade');
+                    return;
+                }
+                
+                // In a real application, you would make an API call here
+                // For this demo, we'll just show some sample data
+                showResults([
+                    { rollNumber: '2023001', subject: subject, grade: selectedGrade, internalMarks: 25 },
+                    { rollNumber: '2023002', subject: subject, grade: selectedGrade, internalMarks: 22 },
+                    { rollNumber: '2023003', subject: subject, grade: selectedGrade, internalMarks: 24 }
+                ]);
+            }
+        }
+        
+        function showResults(data) {
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.rollNumber}</td>
+                    <td>${item.subject}</td>
+                    <td>${item.grade}</td>
+                    <td>${item.internalMarks}</td>
+                `;
+                resultsBody.appendChild(row);
+            });
+            
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

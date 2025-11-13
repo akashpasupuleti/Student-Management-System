@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/animations.css}">
+    <style>
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--primary-gradient);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-page::before {
+            content: '';
+            position: absolute;
+            width: 2000px;
+            height: 2000px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            top: -1000px;
+            right: -1000px;
+            animation: float 15s infinite linear;
+            z-index: 0;
+        }
+
+        .login-page::after {
+            content: '';
+            position: absolute;
+            width: 1500px;
+            height: 1500px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            bottom: -750px;
+            left: -750px;
+            animation: float 20s infinite linear reverse;
+            z-index: 0;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .login-card:hover::before {
+            left: 100%;
+        }
+
+        .login-title {
+            font-size: 2.2rem;
+            color: #fff;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .login-title::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-color);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 3px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus + i {
+            color: var(--accent-color);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .login-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .login-button:hover::before {
+            left: 100%;
+        }
+
+        .login-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .error-message {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ffeb3b;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-weight: 500;
+            animation: shake 0.5s ease;
+        }
+
+        .extra-links {
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .extra-links a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .extra-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            bottom: -2px;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+
+        .extra-links a:hover::after {
+            width: 100%;
+        }
+
+        #reset-message {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .login-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .login-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body class="login-page">
+    <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+
+
+    <div class="login-card">
+        <h1 class="login-title">🎓 Student Login</h1>
+
+        <form action="/login" method="post" autocomplete="off" class="login-form" spellcheck="false" onsubmit="return validateForm()">
+            <!-- Roll Number -->
+            <div class="input-group animate-slide-up">
+                <input type="text" id="htnoField" name="htno" placeholder="Roll Number" autocomplete="off" autocorrect="off" autocapitalize="off" required>
+                <i class="fas fa-id-card"></i>
+            </div>
+
+            <!-- Password -->
+            <div class="input-group animate-slide-up" style="animation-delay: 0.1s; position: relative;">
+                <input type="password" id="passwordField" name="password" placeholder="Password" autocomplete="new-password" autocorrect="off" autocapitalize="off" required>
+                <i class="fas fa-lock"></i>
+                <i class="fas fa-eye password-toggle" onclick="togglePasswordVisibility('passwordField', this)" style="position: absolute; right: 1rem; left: auto; cursor: pointer; transition: all 0.3s ease; opacity: 0.7;"></i>
+            </div>
+
+            <!-- Login Button -->
+            <button type="submit" class="login-button animate-slide-up" style="animation-delay: 0.2s;">
+                <span>Login</span>
+            </button>
+
+            <!-- Error Message -->
+            <div class="error-message" th:if="${error}" th:text="${error}"></div>
+
+            <!-- Success Message -->
+            <div class="success-message" th:if="${message}" th:text="${message}" style="background: rgba(46, 213, 115, 0.2); color: #2ed573; padding: 0.75rem; border-radius: 8px; margin-top: 1rem; font-weight: 500;"></div>
+
+            <!-- Extra Links -->
+            <div class="extra-links animate-fade-in" style="animation-delay: 0.3s;">
+                <p>
+                    <a href="#" onclick="forgotPassword(event)">Forgot Password?</a>
+                </p>
+                <p class="mt-2">Don't have an account? <a href="/signup">Create Account</a></p>
+                <div id="reset-container" style="display: none; margin-top: 15px;">
+                    <div class="progress-container" style="height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; margin-bottom: 10px; overflow: hidden;">
+                        <div id="progress-bar" style="height: 100%; width: 0%; background: var(--accent-color); transition: width 0.3s ease;"></div>
+                    </div>
+                    <p id="reset-message" style="margin: 0;"></p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+<script th:src="@{/js/animations.js}"></script>
+<script>
+    function validateForm() {
+        const htno = document.getElementById("htnoField").value.trim();
+        const password = document.getElementById("passwordField").value.trim();
+        const errorContainer = document.querySelector(".error-message") || document.createElement("div");
+
+        if (!errorContainer.classList.contains("error-message")) {
+            errorContainer.className = "error-message";
+            document.querySelector(".login-button").after(errorContainer);
+        }
+
+        // Hide any existing error message
+        errorContainer.style.display = "none";
+
+        // Validate Roll Number
+        if (!htno) {
+            errorContainer.textContent = "❌ Please enter your Roll Number";
+            errorContainer.style.display = "block";
+            addShakeAnimation(document.getElementById("htnoField"));
+            return false;
+        }
+
+        // Validate Password
+        if (!password) {
+            errorContainer.textContent = "❌ Please enter your password";
+            errorContainer.style.display = "block";
+            addShakeAnimation(document.getElementById("passwordField"));
+            return false;
+        }
+
+        return true;
+    }
+
+    function forgotPassword(event) {
+        event.preventDefault();
+        const htno = document.getElementById("htnoField").value.trim();
+        const resetMessage = document.getElementById("reset-message");
+        const resetContainer = document.getElementById("reset-container");
+        const progressBar = document.getElementById("progress-bar");
+
+        console.log("Forgot password function called for HTNO:", htno);
+
+        if (!htno) {
+            resetContainer.style.display = "block";
+            resetMessage.innerText = "⚠️ Please enter your Roll Number first.";
+            resetMessage.style.color = "#ffeb3b";
+            addShakeAnimation(document.getElementById("htnoField"));
+            setTimeout(() => {
+                resetContainer.style.display = "none";
+            }, 3000);
+            console.log("No HTNO provided");
+            return;
+        }
+
+        // Show progress container
+        resetContainer.style.display = "block";
+        resetMessage.innerText = "Preparing to send reset link...";
+        resetMessage.style.color = "#fff";
+
+        // Animate progress bar
+        progressBar.style.width = "0%";
+        progressBar.style.background = "var(--accent-color)";
+        console.log("Progress container displayed");
+
+        // Simulate progress steps
+        setTimeout(() => {
+            progressBar.style.width = "15%";
+            resetMessage.innerText = "Validating student information...";
+            console.log("Progress: 15%");
+        }, 300);
+
+        setTimeout(() => {
+            progressBar.style.width = "40%";
+            resetMessage.innerText = "Generating secure reset token...";
+            console.log("Progress: 40%");
+        }, 800);
+
+        setTimeout(() => {
+            progressBar.style.width = "65%";
+            resetMessage.innerText = "Preparing email...";
+            console.log("Progress: 65%");
+        }, 1300);
+
+        // Make the actual request after showing some progress
+        setTimeout(() => {
+            progressBar.style.width = "85%";
+            resetMessage.innerText = "Sending email...";
+            console.log("Progress: 85%, making actual request");
+
+            console.log(`Sending forgot password request for HTNO: ${htno}`);
+
+            // Add a timeout to abort the request if it takes too long
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                console.log("Request timeout reached, aborting");
+                controller.abort();
+            }, 30000); // 30 second timeout
+
+            // Create the URL with a timestamp to prevent caching
+            const url = `/forgot-password?htno=${htno}&_=${new Date().getTime()}`;
+            console.log("Request URL:", url);
+
+            fetch(url, {
+                signal: controller.signal,
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
+            })
+            .then(res => {
+                console.log('Response status:', res.status);
+                clearTimeout(timeoutId);
+
+                // Check for error status codes
+                if (!res.ok) {
+                    if (res.status === 403) {
+                        throw new Error('Access denied. Please contact support.');
+                    } else if (res.status === 404) {
+                        throw new Error('Endpoint not found. Please contact support.');
+                    } else {
+                        throw new Error(`Server error: ${res.status}`);
+                    }
+                }
+
+                return res.text();
+            })
+            .then(msg => {
+                console.log('Response message:', msg);
+                progressBar.style.width = "100%";
+                console.log("Progress: 100%");
+
+                // Check if the response contains a direct reset link
+                if (msg.includes("http://localhost:8081/reset-password?token=")) {
+                    console.log("Direct reset link found in response");
+                    // Extract the reset link
+                    const linkStart = msg.indexOf("http");
+                    const resetLink = msg.substring(linkStart).trim();
+                    console.log("Extracted reset link:", resetLink);
+
+                    // Create a clickable link
+                    resetMessage.innerHTML = msg.substring(0, linkStart) +
+                        `<a href="${resetLink}" style="color: #2ed573; text-decoration: underline; display: block; margin-top: 10px; word-break: break-all;">${resetLink}</a>`;
+
+                    resetMessage.style.color = "#2ed573";
+                    progressBar.style.background = "#2ed573";
+                    console.log("Displayed clickable reset link");
+                }
+                // Error message
+                else if (msg.includes("❌")) {
+                    console.log("Error message found in response");
+                    progressBar.style.background = "#ff4757";
+                    resetMessage.style.color = "#ffeb3b";
+                    addShakeAnimation(resetMessage);
+                    resetMessage.innerText = msg;
+                    console.log("Displayed error message");
+                }
+                // Success message
+                else {
+                    console.log("Success message found in response");
+                    progressBar.style.background = "#2ed573";
+                    resetMessage.style.color = "#2ed573";
+                    resetMessage.innerText = msg;
+                    console.log("Displayed success message");
+
+                    // Hide the container after some time if successful
+                    setTimeout(() => {
+                        resetContainer.style.display = "none";
+                        console.log("Reset container hidden after success");
+                    }, 5000);
+                }
+            })
+            .catch((error) => {
+                console.error('Fetch error:', error);
+                clearTimeout(timeoutId);
+
+                progressBar.style.width = "100%";
+                progressBar.style.background = "#ff4757";
+
+                if (error.name === 'AbortError') {
+                    resetMessage.innerText = "❌ Request timed out. The server took too long to respond.";
+                } else {
+                    resetMessage.innerText = `❌ Failed to send reset link: ${error.message}`;
+                }
+
+                resetMessage.style.color = "#ffeb3b";
+                addShakeAnimation(resetMessage);
+            });
+        }, 1800);
+    }
+
+    // No direct reset functions needed
+
+    // Add floating animation to login card
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add staggered animations to form elements
+        const formElements = document.querySelectorAll('.animate-slide-up');
+        formElements.forEach((el, index) => {
+            el.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+        });
+
+        // Define animation functions if not loaded from external file
+        if (typeof addShakeAnimation !== 'function') {
+            window.addShakeAnimation = function(element) {
+                element.classList.add('shake');
+                setTimeout(() => {
+                    element.classList.remove('shake');
+                }, 500);
+            };
+        }
+
+        // Add hover effect to password toggle
+        const passwordToggle = document.querySelector('.password-toggle');
+        if (passwordToggle) {
+            passwordToggle.addEventListener('mouseenter', function() {
+                this.style.opacity = '1';
+                this.style.color = 'var(--accent-color)';
+            });
+            passwordToggle.addEventListener('mouseleave', function() {
+                this.style.opacity = '0.7';
+                this.style.color = '';
+            });
+        }
+    });
+
+    // Toggle password visibility
+    function togglePasswordVisibility(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
+</body>
+</html>

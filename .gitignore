@@ -1,0 +1,85 @@
+##############################
+# Java / Spring Boot
+##############################
+/target/
+*.log
+*.out
+*.tmp
+
+##############################
+# Maven
+##############################
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+##############################
+# Build
+##############################
+/build/
+/bin/
+
+##############################
+# IntelliJ IDEA
+##############################
+.idea/
+*.iml
+*.ipr
+*.iws
+
+##############################
+# Eclipse / STS
+##############################
+.project
+.classpath
+.settings/
+.springBeans
+
+##############################
+# VSCode
+##############################
+.vscode/
+
+##############################
+# Operating System files
+##############################
+.DS_Store
+Thumbs.db
+
+##############################
+# Environment / Secrets
+##############################
+*.env
+application-local.properties
+application-secret.properties
+.env.*
+*.key
+*.pem
+
+# If application.properties has secrets, ignore it:
+# application.properties
+
+##############################
+# Cache
+##############################
+/*.cache/
+*.swp
+
+##############################
+# Batch / Shell Scripts (optional)
+##############################
+*.bat
+*.sh
+
+##############################
+# Logs
+##############################
+logs/
+*.log
+
+##############################
+# Temporary files
+##############################
+*.tmp
+*.bak
+*.old

@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Student Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+            --primary-color: #5a67d8;
+            --primary-hover: #4c51bf;
+            --accent-color: #ffeb3b;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --card-bg: rgba(255, 255, 255, 0.15);
+            --shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--primary-gradient);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 15px 35px rgba(31, 38, 135, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        h1, h2, h3 {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+            animation-fill-mode: both;
+        }
+
+        .form-group:nth-child(2) { animation-delay: 0.1s; }
+        .form-group:nth-child(3) { animation-delay: 0.2s; }
+        .form-group:nth-child(4) { animation-delay: 0.3s; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            transition: var(--transition);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        select option {
+            background: #5a67d8;
+            color: white;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-block;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease;
+            animation-delay: 0.5s;
+            animation-fill-mode: both;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .highlight-btn {
+            background-color: var(--accent-color) !important;
+            color: var(--text-dark) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .search-options {
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+        }
+
+        .search-type-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-type-btn {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-type-btn i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        .search-type-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-type-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .search-input-container {
+            position: relative;
+            margin-bottom: 25px;
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+            animation-delay: 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .search-input {
+            padding-left: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .grade-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+            justify-content: center;
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+            animation-delay: 0.3s;
+            animation-fill-mode: both;
+            transition: all 0.3s ease;
+        }
+
+        .grade-options.highlight {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 235, 59, 0.3);
+            transform: scale(1.03);
+        }
+
+        /* Animation for showing grade options */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        #gradeOptionsGroup.show-animation {
+            animation: fadeInScale 0.5s ease-out;
+        }
+
+        .grade-btn {
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-family: 'Poppins', sans-serif;
+            min-width: 50px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .grade-btn.active {
+            background-color: var(--accent-color);
+            color: var(--text-dark);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .grade-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Pulse animation for grade buttons */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 10px rgba(255, 235, 59, 0.5); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 1s infinite;
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+        }
+
+        .results-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-count {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        tr {
+            background: rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        td {
+            color: var(--text-light);
+        }
+
+        .suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: rgba(90, 103, 216, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: block;
+            width: 100%;
+            text-align: left;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--accent-color);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #ffffff;
+            background-color: rgba(211, 47, 47, 0.8);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: shake 0.5s ease;
+            border-left: 4px solid #ff1744;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Grade styling */
+        .grade-a {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .grade-b {
+            color: #8BC34A;
+            font-weight: bold;
+        }
+
+        .grade-c {
+            color: #FFC107;
+            font-weight: bold;
+        }
+
+        .grade-d {
+            color: #FF9800;
+            font-weight: bold;
+        }
+
+        .grade-e {
+            color: #FF5722;
+            font-weight: bold;
+        }
+
+        .grade-f {
+            color: #F44336;
+            font-weight: bold;
+        }
+
+        .grade-mp {
+            color: #9C27B0;
+            font-weight: bold;
+        }
+
+        .grade-ab {
+            color: #607D8B;
+            font-weight: bold;
+        }
+
+        /* SGPA and CGPA styling */
+        .gpas-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .gpa-badge {
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+        }
+
+        .sgpa-badge {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.4));
+            color: #4CAF50;
+        }
+
+        .cgpa-badge {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 193, 7, 0.4));
+            color: #FFC107;
+        }
+
+        /* Animation for the shake effect */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                align-items: flex-start;
+            }
+
+            .container {
+                padding: 10px;
+                width: 100%;
+            }
+
+            .card {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .search-type-container {
+                flex-direction: column;
+            }
+
+            .grade-options {
+                justify-content: center;
+            }
+
+            .btn {
+                padding: 12px 15px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            th, td {
+                padding: 12px 10px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/teacher-dashboard" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+
+        <h1><i class="fas fa-search"></i> Enhanced Student Search</h1>
+
+        <div class="card">
+            <h2><i class="fas fa-filter"></i> Select Criteria</h2>
+
+            <div id="errorMessage" class="error-message"></div>
+
+            <div class="form-group">
+                <label for="department">Department:</label>
+                <select id="department" onchange="handleDepartmentChange()">
+                    <option value="">Select Department</option>
+                    <option value="CS">CS</option>
+                    <option value="ECE">ECE</option>
+                    <option value="EEE">EEE</option>
+                    <option value="MECH">MECH</option>
+                    <option value="IT">IT</option>
+                    <option value="CIVIL">CIVIL</option>
+                </select>
+            </div>
+
+            <div id="subDepartmentContainer" class="form-group hidden">
+                <label for="subDepartment">Sub-Department:</label>
+                <select id="subDepartment">
+                    <option value="">Select Sub-Department</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="semester">Semester:</label>
+                <select id="semester">
+                    <option value="">Select Semester</option>
+                    <option value="1-1">1-1</option>
+                    <option value="1-2">1-2</option>
+                    <option value="2-1">2-1</option>
+                    <option value="2-2">2-2</option>
+                    <option value="3-1">3-1</option>
+                    <option value="3-2">3-2</option>
+                    <option value="4-1">4-1</option>
+                    <option value="4-2">4-2</option>
+                </select>
+            </div>
+
+            <button id="continueBtn" class="btn btn-block" onclick="showSearchOptions()"><i class="fas fa-arrow-right"></i> Continue</button>
+        </div>
+
+        <div id="searchOptionsCard" class="card search-options">
+            <h2><i class="fas fa-search"></i> Search Options</h2>
+
+            <div class="search-type-container">
+                <button id="rollNumberBtn" class="search-type-btn active" onclick="setSearchType('roll')"><i class="fas fa-id-card"></i> Roll Number</button>
+                <button id="subjectBtn" class="search-type-btn" onclick="setSearchType('subject')"><i class="fas fa-book"></i> Subject</button>
+            </div>
+
+            <div id="rollNumberSearch">
+                <div class="search-input-container">
+                    <span class="search-icon"><i class="fas fa-id-card"></i></span>
+                    <input type="text" id="rollNumberInput" class="search-input" placeholder="Enter Roll Number">
+                </div>
+
+                <button id="searchRollBtn" class="btn btn-block" onclick="searchByRollNumber()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+
+            <div id="subjectSearch" class="hidden">
+                <div class="search-input-container">
+                    <span class="search-icon"><i class="fas fa-book"></i></span>
+                    <input type="text" id="subjectInput" class="search-input" placeholder="Enter Subject Name" oninput="getSubjectSuggestions()">
+                    <div id="suggestionsContainer" class="suggestions-container"></div>
+                </div>
+
+                <div class="form-group" id="gradeOptionsGroup" style="display: none;">
+                    <label id="gradeLabel">Select Grade:</label>
+                    <div class="grade-options">
+                        <button type="button" class="grade-btn" onclick="selectGrade('A+')">A+</button>
+                        <button type="button" class="grade-btn" onclick="selectGrade('A')">A</button>
+                        <button type="button" class="grade-btn" onclick="selectGrade('B')">B</button>
+                        <button type="button" class="grade-btn" onclick="selectGrade('C')">C</button>
+                        <button type="button" class="grade-btn" onclick="selectGrade('D')">D</button>
+                        <button type="button" class="grade-btn" onclick="selectGrade('E')">E</button>
+                        <button type="button" class="grade-btn" onclick="selectGrade('F')">F</button>
+                        <button type="button" class="grade-btn" onclick="selectGrade('MP')">MP</button>
+                        <button type="button" class="grade-btn" onclick="selectGrade('AB')">AB</button>
+                    </div>
+                </div>
+
+                <button id="searchSubjectBtn" class="btn btn-block" onclick="searchBySubject()" style="display: none;">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+
+        <div id="resultsContainer" class="card results-container">
+            <div class="results-title">
+                <h2 id="resultsTitle"><i class="fas fa-table"></i> Search Results</h2>
+                <span id="resultsCount" class="results-count"><i class="fas fa-list"></i> 0 results</span>
+            </div>
+
+            <div id="gpasContainer" class="gpas-container" style="display: none;"></div>
+
+            <table id="resultsTable">
+                <thead id="resultsTableHead">
+                    <!-- Table headers will be dynamically added -->
+                </thead>
+                <tbody id="resultsTableBody">
+                    <!-- Results will be dynamically added -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSearchType = 'roll';
+        let selectedGrade = null;
+        let selectedDept = '';
+        let selectedSubDept = '';
+        let selectedSemester = '';
+        let selectedSubject = '';
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners
+            document.getElementById('department').addEventListener('change', handleDepartmentChange);
+            document.getElementById('subDepartment').addEventListener('change', handleSubDepartmentChange);
+            document.getElementById('semester').addEventListener('change', handleSemesterChange);
+
+            // Close suggestions when clicking outside
+            document.addEventListener('click', function(event) {
+                const suggestionsContainer = document.getElementById('suggestionsContainer');
+                const subjectInput = document.getElementById('subjectInput');
+
+                // Check if the click is outside the suggestions container and input
+                if (event.target !== subjectInput && !suggestionsContainer.contains(event.target)) {
+                    suggestionsContainer.style.display = 'none';
+                }
+            }, true); // Use capture phase
+        });
+
+        // Handle department change
+        function handleDepartmentChange() {
+            const department = document.getElementById('department').value;
+            const subDepartmentContainer = document.getElementById('subDepartmentContainer');
+            const subDepartmentSelect = document.getElementById('subDepartment');
+
+            // Clear sub-department select
+            subDepartmentSelect.innerHTML = '<option value="">Select Sub-Department</option>';
+
+            if (department === 'CS') {
+                // Show sub-department dropdown for CS
+                subDepartmentContainer.classList.remove('hidden');
+
+                // Use hardcoded values instead of fetching to avoid duplicates
+                const subDepts = ['CSE', 'CSD', 'CSM'];
+                subDepts.forEach(subDept => {
+                    const option = document.createElement('option');
+                    option.value = subDept;
+                    option.textContent = subDept;
+                    subDepartmentSelect.appendChild(option);
+                });
+            } else {
+                // Hide sub-department dropdown for other departments
+                subDepartmentContainer.classList.add('hidden');
+                selectedDept = department;
+            }
+
+            // Reset search options
+            document.getElementById('searchOptionsCard').style.display = 'none';
+
+            console.log('Department changed to:', department);
+        }
+
+        // Handle sub-department change
+        function handleSubDepartmentChange() {
+            selectedSubDept = document.getElementById('subDepartment').value;
+            selectedDept = selectedSubDept; // For CS, we use the sub-department as the department
+            console.log('Sub-department changed to:', selectedSubDept);
+            console.log('Selected department is now:', selectedDept);
+        }
+
+        // Handle semester change
+        function handleSemesterChange() {
+            selectedSemester = document.getElementById('semester').value;
+        }
+
+        // Show search options after initial selections
+        function showSearchOptions() {
+            const department = document.getElementById('department').value;
+            const subDepartmentContainer = document.getElementById('subDepartmentContainer');
+            const subDepartment = document.getElementById('subDepartment').value;
+            const semester = document.getElementById('semester').value;
+
+            // Validate selections
+            if (!department) {
+                showError('Please select a department');
+                return;
+            }
+
+            if (department === 'CS' && !subDepartment) {
+                showError('Please select a sub-department');
+                return;
+            }
+
+            if (!semester) {
+                showError('Please select a semester');
+                return;
+            }
+
+            // Set selected values
+            selectedDept = department === 'CS' ? subDepartment : department;
+            selectedSemester = semester;
+
+            console.log('Selected department:', selectedDept);
+            console.log('Selected semester:', selectedSemester);
+
+            // Show search options
+            document.getElementById('searchOptionsCard').style.display = 'block';
+
+            // Hide error message
+            document.getElementById('errorMessage').style.display = 'none';
+
+            // Hide results container
+            document.getElementById('resultsContainer').style.display = 'none';
+        }
+
+        // Set search type (roll or subject)
+        function setSearchType(type) {
+            currentSearchType = type;
+
+            // Update button states
+            document.getElementById('rollNumberBtn').classList.toggle('active', type === 'roll');
+            document.getElementById('subjectBtn').classList.toggle('active', type === 'subject');
+
+            // Show/hide appropriate search containers
+            document.getElementById('rollNumberSearch').classList.toggle('hidden', type !== 'roll');
+            document.getElementById('subjectSearch').classList.toggle('hidden', type !== 'subject');
+
+            // Reset subject search when switching to it
+            if (type === 'subject') {
+                // Clear subject input
+                document.getElementById('subjectInput').value = '';
+                selectedSubject = '';
+
+                // Hide grade options and search button
+                document.getElementById('gradeOptionsGroup').style.display = 'none';
+                document.getElementById('searchSubjectBtn').style.display = 'none';
+            }
+
+            // Hide results container and clear any previous results
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('gpasContainer').style.display = 'none';
+            document.getElementById('resultsTableBody').innerHTML = '';
+        }
+
+        // Select grade for subject search
+        function selectGrade(grade) {
+            selectedGrade = grade;
+
+            // Update button states
+            const buttons = document.querySelectorAll('.grade-btn');
+            buttons.forEach(button => {
+                button.classList.toggle('active', button.textContent === grade);
+                // Remove pulse animation when a grade is selected
+                button.classList.remove('pulse-animation');
+            });
+
+            // Remove highlight from grade options container
+            document.querySelector('.grade-options').classList.remove('highlight');
+
+            // Update the label to show selected grade and subject
+            const gradeLabel = document.getElementById('gradeLabel');
+            gradeLabel.innerHTML = 'Selected: <span style="color: var(--accent-color);">' + selectedSubject + '</span> with Grade <span style="color: var(--accent-color);">' + grade + '</span>';
+            gradeLabel.style.color = '';
+            gradeLabel.style.fontWeight = '';
+
+            // Show and highlight the search button
+            const searchBtn = document.getElementById('searchSubjectBtn');
+            searchBtn.style.display = 'block';
+            searchBtn.classList.add('highlight-btn');
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> Find Students with Grade ' + grade + ' in ' + selectedSubject;
+
+            // Scroll to the search button
+            searchBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            setTimeout(() => {
+                searchBtn.classList.remove('highlight-btn');
+            }, 2000);
+        }
+
+        // Get subject suggestions based on input
+        function getSubjectSuggestions() {
+            const input = document.getElementById('subjectInput');
+            const query = input.value.trim();
+
+            if (query.length < 2) {
+                document.getElementById('suggestionsContainer').style.display = 'none';
+                return;
+            }
+
+            // Fetch suggestions from API
+            fetch(`/api/subject-suggestions?query=${query}&dept=${selectedDept}&semester=${selectedSemester}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const suggestionsContainer = document.getElementById('suggestionsContainer');
+
+                    if (data.length === 0) {
+                        suggestionsContainer.style.display = 'none';
+                        return;
+                    }
+
+                    // Clear previous suggestions
+                    suggestionsContainer.innerHTML = '';
+
+                    // Add new suggestions with a simple approach
+                    data.forEach(subject => {
+                        const item = document.createElement('div');
+                        item.className = 'suggestion-item';
+                        item.textContent = subject;
+
+                        // Use a simple onclick property with a more direct approach
+                        item.onclick = function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            document.getElementById('subjectInput').value = subject;
+                            selectedSubject = subject;
+                            document.getElementById('suggestionsContainer').style.display = 'none';
+
+                            // Highlight the grade options section after subject selection
+                            highlightGradeOptions();
+
+                            return false;
+                        };
+
+                        suggestionsContainer.appendChild(item);
+                    });
+
+                    // Add a direct click handler to the container for delegation
+                    suggestionsContainer.addEventListener('click', function(e) {
+                        // If we clicked on a suggestion item
+                        if (e.target.classList.contains('suggestion-item')) {
+                            // Set the input value to the clicked item's text
+                            input.value = e.target.textContent;
+                            selectedSubject = e.target.textContent;
+                            suggestionsContainer.style.display = 'none';
+
+                            // Highlight the grade options section after subject selection
+                            highlightGradeOptions();
+                        }
+                    });
+
+                    suggestionsContainer.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error fetching suggestions:', error);
+                    showError('Failed to load subject suggestions. Please try again.');
+                });
+        }
+
+        // Search by roll number
+        function searchByRollNumber() {
+            const rollNumber = document.getElementById('rollNumberInput').value.trim();
+
+            if (!rollNumber) {
+                showError('Please enter a roll number');
+                return;
+            }
+
+            // Clear any previous results
+            document.getElementById('resultsTableBody').innerHTML = '';
+            document.getElementById('gpasContainer').innerHTML = '';
+            document.getElementById('gpasContainer').style.display = 'none';
+
+            // Show loading state
+            document.getElementById('resultsTitle').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading results...';
+            document.getElementById('resultsContainer').style.display = 'block';
+
+            console.log('Searching for roll number:', rollNumber);
+            console.log('Department:', selectedDept);
+            console.log('Semester:', selectedSemester);
+
+            // Fetch results from API
+            console.log(`Fetching results for htno=${rollNumber}, dept=${selectedDept}, semester=${selectedSemester}`);
+            fetch(`/api/search-by-roll?htno=${rollNumber}&dept=${selectedDept}&semester=${selectedSemester}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Search results:', data);
+                    const subjects = data.subjects || [];
+                    const sgpa = data.sgpa;
+                    const cgpa = data.cgpa;
+
+                    // Clear any previous results
+                    document.getElementById('resultsTableBody').innerHTML = '';
+                    document.getElementById('gpasContainer').style.display = 'none';
+                    document.getElementById('gpasContainer').innerHTML = '';
+
+                    if (subjects.length === 0) {
+                        document.getElementById('resultsTitle').innerHTML = '<i class="fas fa-exclamation-circle"></i> No results found';
+                        document.getElementById('resultsCount').innerHTML = '<i class="fas fa-list"></i> 0 results';
+                        return;
+                    }
+
+                    // Update results title with SGPA and CGPA if available
+                    let titleHtml = `<i class="fas fa-user"></i> Results for ${rollNumber}`;
+
+                    // Create SGPA and CGPA display
+                    let gpasHtml = '';
+
+                    // Always display SGPA and CGPA
+                    // Convert to number and check if it's a valid number
+                    const sgpaValue = Number(sgpa);
+                    const cgpaValue = Number(cgpa);
+
+                    // Always add SGPA badge
+                    if (!isNaN(sgpaValue)) {
+                        gpasHtml += `<div class="gpa-badge sgpa-badge"><i class="fas fa-chart-line"></i> SGPA: ${sgpaValue.toFixed(2)}</div>`;
+                    } else {
+                        // If SGPA is not a valid number, display 0.00
+                        gpasHtml += `<div class="gpa-badge sgpa-badge"><i class="fas fa-chart-line"></i> SGPA: 0.00</div>`;
+                    }
+
+                    // Always add CGPA badge
+                    if (!isNaN(cgpaValue)) {
+                        gpasHtml += `<div class="gpa-badge cgpa-badge"><i class="fas fa-award"></i> CGPA: ${cgpaValue.toFixed(2)}</div>`;
+                    } else {
+                        // If CGPA is not a valid number, display 0.00
+                        gpasHtml += `<div class="gpa-badge cgpa-badge"><i class="fas fa-award"></i> CGPA: 0.00</div>`;
+                    }
+
+                    console.log('SGPA:', sgpaValue, 'CGPA:', cgpaValue);
+
+                    // Always display the SGPA and CGPA container
+                    document.getElementById('gpasContainer').innerHTML = gpasHtml;
+                    document.getElementById('gpasContainer').style.display = 'flex';
+
+                    document.getElementById('resultsTitle').innerHTML = titleHtml;
+                    document.getElementById('resultsCount').innerHTML = `<i class="fas fa-list"></i> ${subjects.length} results`;
+
+                    // Set table headers
+                    document.getElementById('resultsTableHead').innerHTML = `
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> Subject Code</th>
+                            <th><i class="fas fa-book"></i> Subject Name</th>
+                            <th><i class="fas fa-star"></i> Credits</th>
+                            <th><i class="fas fa-award"></i> Grade</th>
+                            <th><i class="fas fa-chart-bar"></i> Internal Marks</th>
+                        </tr>
+                    `;
+
+                    // Add results to table
+                    const tbody = document.getElementById('resultsTableBody');
+                    tbody.innerHTML = '';
+
+                    subjects.forEach(subject => {
+                        const row = document.createElement('tr');
+
+                        // Add a class based on the grade for visual indication
+                        const gradeClass = getGradeClass(subject.grade);
+
+                        row.innerHTML = `
+                            <td>${subject.subcode || 'N/A'}</td>
+                            <td>${subject.subname || 'N/A'}</td>
+                            <td>${subject.credit || 'N/A'}</td>
+                            <td class="${gradeClass}">${subject.grade || 'N/A'}</td>
+                            <td>${subject.internals || 'N/A'}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching results:', error);
+                    showError('Failed to fetch results. Please try again.');
+                    document.getElementById('resultsContainer').style.display = 'none';
+                });
+        }
+
+        // Search by subject and grade
+        function searchBySubject() {
+            // Use either the selected subject or the input value
+            const inputValue = document.getElementById('subjectInput').value.trim();
+            const subject = selectedSubject || inputValue;
+
+            if (!subject) {
+                showError('Please enter a subject');
+                return;
+            }
+
+            if (!selectedGrade) {
+                showError('Please select a grade');
+                return;
+            }
+
+            // Clear any previous results
+            document.getElementById('resultsTableBody').innerHTML = '';
+            document.getElementById('gpasContainer').innerHTML = '';
+            document.getElementById('gpasContainer').style.display = 'none';
+
+            // Show loading state
+            document.getElementById('resultsTitle').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading results...';
+            document.getElementById('resultsContainer').style.display = 'block';
+
+            console.log('Searching for subject:', subject);
+            console.log('Grade:', selectedGrade);
+            console.log('Department:', selectedDept);
+            console.log('Semester:', selectedSemester);
+
+            // Fetch results from API
+            fetch(`/api/search-by-subject?subject=${subject}&grade=${selectedGrade}&dept=${selectedDept}&semester=${selectedSemester}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Clear any previous results
+                    document.getElementById('resultsTableBody').innerHTML = '';
+                    document.getElementById('gpasContainer').style.display = 'none';
+                    document.getElementById('gpasContainer').innerHTML = '';
+
+                    if (data.length === 0) {
+                        document.getElementById('resultsTitle').innerHTML = '<i class="fas fa-exclamation-circle"></i> No results found';
+                        document.getElementById('resultsCount').innerHTML = '<i class="fas fa-list"></i> 0 results';
+                        return;
+                    }
+
+                    // Update results title
+                    document.getElementById('resultsTitle').innerHTML =
+                        `<i class="fas fa-users"></i> Students with Grade ${selectedGrade} in ${subject}`;
+                    document.getElementById('resultsCount').innerHTML = `<i class="fas fa-list"></i> ${data.length} results`;
+
+                    // Set table headers
+                    document.getElementById('resultsTableHead').innerHTML = `
+                        <tr>
+                            <th><i class="fas fa-id-card"></i> Roll Number</th>
+                            <th><i class="fas fa-book"></i> Subject</th>
+                            <th><i class="fas fa-award"></i> Grade</th>
+                            <th><i class="fas fa-chart-bar"></i> Internal Marks</th>
+                            <th><i class="fas fa-university"></i> College</th>
+                        </tr>
+                    `;
+
+                    // Add results to table
+                    const tbody = document.getElementById('resultsTableBody');
+                    tbody.innerHTML = '';
+
+                    data.forEach(result => {
+                        const row = document.createElement('tr');
+
+                        // Add a class based on the grade for visual indication
+                        const gradeClass = getGradeClass(result.grade);
+
+                        row.innerHTML = `
+                            <td>${result.htno || 'N/A'}</td>
+                            <td>${result.subname || 'N/A'}</td>
+                            <td class="${gradeClass}">${result.grade || 'N/A'}</td>
+                            <td>${result.internals || 'N/A'}</td>
+                            <td>${result.college || 'N/A'}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching results:', error);
+                    showError('Failed to fetch results. Please try again.');
+                    document.getElementById('resultsContainer').style.display = 'none';
+                });
+        }
+
+        // Get CSS class for grade styling
+        function getGradeClass(grade) {
+            if (!grade) return '';
+
+            const gradeUpper = grade.toUpperCase();
+            if (gradeUpper === 'A+' || gradeUpper === 'A') return 'grade-a';
+            if (gradeUpper === 'B') return 'grade-b';
+            if (gradeUpper === 'C') return 'grade-c';
+            if (gradeUpper === 'D') return 'grade-d';
+            if (gradeUpper === 'E') return 'grade-e';
+            if (gradeUpper === 'F') return 'grade-f';
+            if (gradeUpper === 'MP') return 'grade-mp';
+            if (gradeUpper === 'AB') return 'grade-ab';
+            return '';
+        }
+
+        // Function to show and highlight the grade options after subject selection
+        function highlightGradeOptions() {
+            // Show the grade options group with animation
+            const gradeOptionsGroup = document.getElementById('gradeOptionsGroup');
+            gradeOptionsGroup.style.display = 'block';
+            gradeOptionsGroup.classList.add('show-animation');
+
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                gradeOptionsGroup.classList.remove('show-animation');
+            }, 500);
+
+            const gradeOptionsContainer = document.querySelector('.grade-options');
+            const gradeLabel = document.getElementById('gradeLabel');
+
+            // Reset selected grade
+            selectedGrade = null;
+
+            // Reset active state on all grade buttons
+            const gradeButtons = document.querySelectorAll('.grade-btn');
+            gradeButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add highlight class
+            gradeOptionsContainer.classList.add('highlight');
+
+            // Scroll to the grade options
+            gradeOptionsGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Add a pulsing effect to the label
+            gradeLabel.innerHTML = '<i class="fas fa-hand-point-down"></i> Select Grade for <span style="color: var(--accent-color);">' + selectedSubject + '</span>:';
+            gradeLabel.style.color = 'white';
+            gradeLabel.style.fontWeight = 'bold';
+
+            // Add pulsing animation to grade buttons
+            gradeButtons.forEach(btn => {
+                btn.classList.add('pulse-animation');
+            });
+
+            // Hide the search button until a grade is selected
+            document.getElementById('searchSubjectBtn').style.display = 'none';
+
+            // Remove the highlight after 5 seconds but keep the grade options visible
+            setTimeout(() => {
+                gradeOptionsContainer.classList.remove('highlight');
+                gradeLabel.style.fontWeight = '';
+                gradeLabel.innerHTML = 'Select Grade for <span style="color: var(--accent-color);">' + selectedSubject + '</span>:';
+
+                // Remove pulsing animation
+                gradeButtons.forEach(btn => {
+                    btn.classList.remove('pulse-animation');
+                });
+            }, 5000);
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            errorElement.style.display = 'block';
+
+            // Add shake animation
+            errorElement.classList.add('shake');
+
+            // Remove shake animation after it completes
+            setTimeout(() => {
+                errorElement.classList.remove('shake');
+            }, 500);
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

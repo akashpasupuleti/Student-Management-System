@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Students</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+            --primary-color: #5a67d8;
+            --primary-hover: #4c51bf;
+            --accent-color: #ffeb3b;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --input-bg: rgba(255, 255, 255, 0.2);
+            --shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --transition-fast: 0.3s ease;
+        }
+        .search-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background: var(--primary-gradient);
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .search-container {
+            width: 90%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
+
+        .search-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-form .form-group {
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: none;
+            background: var(--input-bg);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .search-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .search-type-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-type-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            flex: 1;
+            text-align: center;
+        }
+
+        .search-type-btn.active {
+            background: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-type-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-input-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border-radius: 8px;
+            border: none;
+            background: var(--input-bg);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            background: var(--primary-color);
+            color: var(--text-light);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-container {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px 15px;
+            text-align: left;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+        }
+
+        .results-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .grade-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .grade-option {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .grade-option.active {
+            background: var(--accent-color);
+            color: var(--text-dark);
+        }
+
+        .suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 0 0 8px 8px;
+            z-index: 10;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+
+        .back-button:hover {
+            color: var(--accent-color);
+        }
+
+        .back-button i {
+            margin-right: 0.5rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Animation classes */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideInUp 0.5s ease forwards;
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                padding: 1.5rem;
+            }
+
+            .search-title {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body class="search-page">
+    <div class="search-container">
+        <a href="/teacher-dashboard" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1 class="search-title">Search Students</h1>
+
+        <!-- Initial Filters -->
+        <form id="searchForm" class="search-form">
+            <!-- Department -->
+            <div class="form-group animate-slide-up" style="animation-delay: 0.1s;">
+                <label for="mainDept">Department</label>
+                <select id="mainDept" name="mainDept" onchange="toggleSubDept()" required>
+                    <option value="" disabled selected>Select Department</option>
+                    <option value="CS">CS</option>
+                    <option value="ECE">ECE</option>
+                    <option value="EEE">EEE</option>
+                    <option value="MECH">MECH</option>
+                    <option value="IT">IT</option>
+                    <option value="CIVIL">CIVIL</option>
+                </select>
+            </div>
+
+            <!-- Sub-Department -->
+            <div class="form-group animate-slide-up hidden" id="subDeptDiv" style="animation-delay: 0.2s;">
+                <label for="subDept">Sub-Department</label>
+                <select id="subDept" name="subDept">
+                    <option value="" disabled selected>Select Sub-Dept</option>
+                    <option value="CSE">CSE</option>
+                    <option value="CSD">CSD</option>
+                    <option value="CSM">CSM</option>
+                </select>
+            </div>
+
+            <!-- Semester -->
+            <div class="form-group animate-slide-up" style="animation-delay: 0.3s;">
+                <label for="semester">Semester</label>
+                <select id="semester" name="semester" required>
+                    <option value="" disabled selected>Select Semester</option>
+                    <option value="1-1">1-1</option>
+                    <option value="1-2">1-2</option>
+                    <option value="2-1">2-1</option>
+                    <option value="2-2">2-2</option>
+                    <option value="3-1">3-1</option>
+                    <option value="3-2">3-2</option>
+                    <option value="4-1">4-1</option>
+                    <option value="4-2">4-2</option>
+                </select>
+            </div>
+        </form>
+
+        <!-- Search Options (Initially Hidden) -->
+        <div id="searchOptions" class="search-options hidden">
+            <h3>Search By:</h3>
+            <div class="search-type-container">
+                <button id="rollNumberBtn" class="search-type-btn active" onclick="setSearchType('roll')">Roll Number</button>
+                <button id="subjectBtn" class="search-type-btn" onclick="setSearchType('subject')">Subject</button>
+            </div>
+
+            <!-- Roll Number Search (Initially Visible) -->
+            <div id="rollNumberSearch" class="search-input-container">
+                <input type="text" id="rollNumberInput" class="search-input" placeholder="Enter Roll Number">
+                <i class="fas fa-id-card search-icon"></i>
+                <button id="searchRollBtn" class="search-btn" onclick="searchByRollNumber()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+
+            <!-- Subject Search (Initially Hidden) -->
+            <div id="subjectSearch" class="search-input-container hidden">
+                <input type="text" id="subjectInput" class="search-input" placeholder="Enter Subject Name" oninput="getSuggestions()">
+                <i class="fas fa-book search-icon"></i>
+                <div id="suggestionsContainer" class="suggestions-container hidden"></div>
+
+                <div class="grade-options">
+                    <button type="button" class="grade-option" data-grade="A" onclick="selectGrade(this)">A</button>
+                    <button type="button" class="grade-option" data-grade="B" onclick="selectGrade(this)">B</button>
+                    <button type="button" class="grade-option" data-grade="C" onclick="selectGrade(this)">C</button>
+                    <button type="button" class="grade-option" data-grade="D" onclick="selectGrade(this)">D</button>
+                    <button type="button" class="grade-option" data-grade="E" onclick="selectGrade(this)">E</button>
+                    <button type="button" class="grade-option" data-grade="F" onclick="selectGrade(this)">F</button>
+                </div>
+
+                <button id="searchSubjectBtn" class="search-btn" onclick="searchBySubject()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" class="results-container hidden">
+            <h3 id="resultsTitle">Search Results</h3>
+            <table id="resultsTable" class="results-table">
+                <thead id="resultsTableHead">
+                    <!-- Table headers will be dynamically added -->
+                </thead>
+                <tbody id="resultsTableBody">
+                    <!-- Results will be dynamically added -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Simple initialization script
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Search page loaded');
+        });
+    </script>
+    <script>
+        let currentSearchType = 'roll';
+        let selectedGrade = null;
+        let selectedDept = '';
+        let selectedSubject = '';
+
+        // Initialize form elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to initial filter fields
+            document.getElementById('mainDept').addEventListener('change', checkInitialFilters);
+            document.getElementById('semester').addEventListener('change', checkInitialFilters);
+            document.getElementById('subDept').addEventListener('change', checkInitialFilters);
+        });
+
+        // Toggle Sub-Department based on Main Department selection
+        function toggleSubDept() {
+            const mainDept = document.getElementById("mainDept").value;
+            const subDeptDiv = document.getElementById("subDeptDiv");
+
+            if (mainDept === "CS") {
+                subDeptDiv.classList.remove('hidden');
+                subDeptDiv.classList.add('animate-fade-in');
+            } else {
+                subDeptDiv.classList.add('hidden');
+            }
+
+            checkInitialFilters();
+        }
+
+        // Check if all initial filters are selected
+        function checkInitialFilters() {
+            const mainDept = document.getElementById("mainDept").value;
+            const semester = document.getElementById("semester").value;
+            const subDeptDiv = document.getElementById("subDeptDiv");
+            const subDept = document.getElementById("subDept").value;
+
+            // Determine the actual department
+            selectedDept = mainDept === "CS" ? subDept : mainDept;
+
+            // Check if all required fields are filled
+            if (mainDept && semester && (mainDept !== "CS" || subDept)) {
+                document.getElementById("searchOptions").classList.remove('hidden');
+            } else {
+                document.getElementById("searchOptions").classList.add('hidden');
+            }
+        }
+
+        // Set search type (roll or subject)
+        function setSearchType(type) {
+            currentSearchType = type;
+
+            // Update button states
+            document.getElementById('rollNumberBtn').classList.toggle('active', type === 'roll');
+            document.getElementById('subjectBtn').classList.toggle('active', type === 'subject');
+
+            // Show/hide appropriate search containers
+            document.getElementById('rollNumberSearch').classList.toggle('hidden', type !== 'roll');
+            document.getElementById('subjectSearch').classList.toggle('hidden', type !== 'subject');
+
+            // Clear previous results
+            document.getElementById('resultsContainer').classList.add('hidden');
+        }
+
+        // Select grade for subject search
+        function selectGrade(button) {
+            // Remove active class from all grade options
+            document.querySelectorAll('.grade-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active class to selected grade
+            button.classList.add('active');
+
+            // Store selected grade
+            selectedGrade = button.getAttribute('data-grade');
+        }
+
+        // Get subject suggestions based on input
+        function getSuggestions() {
+            const input = document.getElementById('subjectInput');
+            const query = input.value.trim();
+
+            if (query.length < 2) {
+                document.getElementById('suggestionsContainer').classList.add('hidden');
+                return;
+            }
+
+            const mainDept = document.getElementById("mainDept").value;
+            const semester = document.getElementById("semester").value;
+            const subDept = document.getElementById("subDept").value;
+            const dept = mainDept === "CS" ? subDept : mainDept;
+
+            if (!dept || !semester) {
+                alert('Please select department and semester first');
+                return;
+            }
+
+            // Fetch suggestions from API
+            fetch(`/api/search/subject-suggestions?query=${query}&dept=${dept}&semester=${semester}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const suggestionsContainer = document.getElementById('suggestionsContainer');
+
+                    if (data.length === 0) {
+                        suggestionsContainer.classList.add('hidden');
+                        return;
+                    }
+
+                    // Clear previous suggestions
+                    suggestionsContainer.innerHTML = '';
+
+                    // Add new suggestions
+                    data.forEach(subject => {
+                        const item = document.createElement('div');
+                        item.className = 'suggestion-item';
+                        item.textContent = subject;
+                        item.addEventListener('click', () => {
+                            input.value = subject;
+                            selectedSubject = subject;
+                            suggestionsContainer.classList.add('hidden');
+                        });
+                        suggestionsContainer.appendChild(item);
+                    });
+
+                    suggestionsContainer.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error fetching suggestions:', error);
+                    alert('Error fetching subject suggestions. Please try again.');
+                });
+        }
+
+        // Search by roll number
+        function searchByRollNumber() {
+            const rollNumber = document.getElementById('rollNumberInput').value.trim();
+
+            if (!rollNumber) {
+                alert('Please enter a roll number');
+                return;
+            }
+
+            const mainDept = document.getElementById("mainDept").value;
+            const semester = document.getElementById("semester").value;
+            const subDept = document.getElementById("subDept").value;
+            const dept = mainDept === "CS" ? subDept : mainDept;
+
+            if (!dept || !semester) {
+                alert('Please select department and semester first');
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('resultsTitle').textContent = 'Loading results...';
+            document.getElementById('resultsContainer').classList.remove('hidden');
+            document.getElementById('resultsTableBody').innerHTML = '';
+
+            // Fetch results from API
+            fetch(`/api/search/search-by-roll?htno=${rollNumber}&dept=${dept}&semester=${semester}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById('resultsTitle').textContent = 'No results found';
+                        document.getElementById('resultsTableBody').innerHTML = '';
+                        return;
+                    }
+
+                    // Update results title
+                    document.getElementById('resultsTitle').textContent = `Results for ${rollNumber} - Semester ${semester}`;
+
+                    // Set table headers
+                    document.getElementById('resultsTableHead').innerHTML = `
+                        <tr>
+                            <th>Subject Code</th>
+                            <th>Subject Name</th>
+                            <th>Credits</th>
+                            <th>Grade</th>
+                            <th>Internal Marks</th>
+                        </tr>
+                    `;
+
+                    // Add results to table
+                    const tbody = document.getElementById('resultsTableBody');
+                    tbody.innerHTML = '';
+
+                    data.forEach(subject => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${subject.subcode}</td>
+                            <td>${subject.subname}</td>
+                            <td>${subject.credit}</td>
+                            <td>${subject.grade}</td>
+                            <td>${subject.internals}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching results:', error);
+                    document.getElementById('resultsTitle').textContent = 'Error fetching results';
+                    alert('Error fetching results. Please try again.');
+                });
+        }
+
+        // Search by subject and grade
+        function searchBySubject() {
+            const subject = document.getElementById('subjectInput').value.trim();
+
+            if (!subject) {
+                alert('Please enter a subject');
+                return;
+            }
+
+            if (!selectedGrade) {
+                alert('Please select a grade');
+                return;
+            }
+
+            const mainDept = document.getElementById("mainDept").value;
+            const semester = document.getElementById("semester").value;
+            const subDept = document.getElementById("subDept").value;
+            const dept = mainDept === "CS" ? subDept : mainDept;
+
+            if (!dept || !semester) {
+                alert('Please select department and semester first');
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('resultsTitle').textContent = 'Loading results...';
+            document.getElementById('resultsContainer').classList.remove('hidden');
+            document.getElementById('resultsTableBody').innerHTML = '';
+
+            // Fetch results from API
+            fetch(`/api/search/search-by-subject?subject=${subject}&grade=${selectedGrade}&dept=${dept}&semester=${semester}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById('resultsTitle').textContent = 'No results found';
+                        document.getElementById('resultsTableBody').innerHTML = '';
+                        return;
+                    }
+
+                    // Update results title
+                    document.getElementById('resultsTitle').textContent =
+                        `Students with Grade ${selectedGrade} in ${subject} - Semester ${semester}`;
+
+                    // Set table headers
+                    document.getElementById('resultsTableHead').innerHTML = `
+                        <tr>
+                            <th>Roll Number</th>
+                            <th>Subject</th>
+                            <th>Grade</th>
+                            <th>Internal Marks</th>
+                            <th>College</th>
+                        </tr>
+                    `;
+
+                    // Add results to table
+                    const tbody = document.getElementById('resultsTableBody');
+                    tbody.innerHTML = '';
+
+                    data.forEach(result => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${result.htno}</td>
+                            <td>${result.subname}</td>
+                            <td>${result.grade}</td>
+                            <td>${result.internals}</td>
+                            <td>${result.college}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching results:', error);
+                    document.getElementById('resultsTitle').textContent = 'Error fetching results';
+                    alert('Error fetching results. Please try again.');
+                });
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(event) {
+            const suggestionsContainer = document.getElementById('suggestionsContainer');
+            const subjectInput = document.getElementById('subjectInput');
+
+            if (event.target !== subjectInput && event.target !== suggestionsContainer) {
+                suggestionsContainer.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

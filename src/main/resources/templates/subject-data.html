@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Semester Result</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            padding-top: 40px;
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .btn {
+            margin-top: 15px;
+            padding: 11px 20px;
+            background-color: #5a67d8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #4c51bf;
+        }
+
+        .sgpa-text {
+            font-size: 18px;
+            color: yellow;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 style="color: white;">Semester: <span th:text="${selectedSemester}"></span></h2>
+
+    <p th:if="${subjects.empty}" style="color: yellow; font-weight: bold;">
+        ⚠️ No data available for this semester. Please upload the Excel sheet first.
+    </p>
+
+    <table class="styled-table" th:if="${!subjects.empty}">
+        <thead>
+        <tr>
+            <th>Subject Code</th>
+            <th>Subject Name</th>
+            <th>Credits</th>
+            <th>Grade</th>
+            <th>Internals</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="subject : ${subjects}">
+            <td th:text="${subject.subcode}"></td>
+            <td th:text="${subject.subname}"></td>
+            <td th:text="${subject.credit}"></td>
+            <td th:text="${subject.grade}"></td>
+            <td th:text="${subject.internals}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <form th:action="@{/subjects/calculate-sgpa}" method="get" th:if="${!subjects.empty}">
+        <input type="hidden" name="htno" th:value="${htno}">
+        <input type="hidden" name="dept" th:value="${dept}">
+        <input type="hidden" name="semester" th:value="${selectedSemester}">
+        <button class="btn" type="submit">Calculate SGPA</button>
+    </form>
+
+    <p th:if="${sgpa != null}" class="sgpa-text">SGPA: <span th:text="${sgpa}"></span></p>
+</div>
+</body>
+</html>

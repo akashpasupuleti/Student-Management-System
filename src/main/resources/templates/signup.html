@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Signup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/animations.css}">
+    <style>
+        .signup-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--primary-gradient);
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .signup-page::before {
+            content: '';
+            position: absolute;
+            width: 2000px;
+            height: 2000px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            top: -1000px;
+            right: -1000px;
+            animation: float 15s infinite linear;
+            z-index: 0;
+        }
+
+        .signup-page::after {
+            content: '';
+            position: absolute;
+            width: 1500px;
+            height: 1500px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            bottom: -750px;
+            left: -750px;
+            animation: float 20s infinite linear reverse;
+            z-index: 0;
+        }
+
+        .signup-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease, slideInUp 0.8s ease;
+        }
+
+        .signup-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .signup-card:hover::before {
+            left: 100%;
+        }
+
+        .signup-title {
+            font-size: 2.2rem;
+            color: #fff;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .signup-title::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-color);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 3px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus + i {
+            color: var(--accent-color);
+        }
+
+        .password-field-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-field-container input {
+            padding-left: 2.5rem;
+            padding-right: 2.5rem;
+        }
+
+        .password-field-container .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+            z-index: 2;
+            background: none;
+            border: none;
+            outline: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes togglePop {
+            0% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.2); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
+
+        .signup-button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .signup-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .signup-button:hover::before {
+            left: 100%;
+        }
+
+        .signup-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .signup-button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .error-message {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ffeb3b;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-weight: 500;
+            animation: shake 0.5s ease;
+        }
+
+        .footer-link {
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .footer-link a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .footer-link a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            bottom: -2px;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+
+        .footer-link a:hover::after {
+            width: 100%;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .signup-page {
+                padding: 4rem 0;
+                align-items: flex-start;
+            }
+
+            .signup-card {
+                padding: 2rem;
+                margin: 1rem;
+                max-width: 90%;
+            }
+
+            .signup-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-height: 800px) {
+            .signup-page {
+                padding: 1rem 0 3rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body class="signup-page">
+    <a href="/login" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="signup-card">
+        <h1 class="signup-title">📝 Student Signup</h1>
+
+        <form action="/signup" method="post" autocomplete="off" class="signup-form" spellcheck="false">
+            <!-- First Name -->
+            <div class="input-group animate-slide-up">
+                <input type="text" name="firstName" placeholder="First Name" autocomplete="off" required>
+                <i class="fas fa-user"></i>
+            </div>
+
+            <!-- Last Name -->
+            <div class="input-group animate-slide-up" style="animation-delay: 0.1s;">
+                <input type="text" name="lastName" placeholder="Last Name" autocomplete="off" required>
+                <i class="fas fa-user"></i>
+            </div>
+
+            <!-- Hall Ticket Number -->
+            <div class="input-group animate-slide-up" style="animation-delay: 0.2s;">
+                <input type="text" name="htno" placeholder="Hall Ticket Number" autocomplete="off" required>
+                <i class="fas fa-id-card"></i>
+            </div>
+
+            <!-- Email -->
+            <div class="input-group animate-slide-up" style="animation-delay: 0.3s;">
+                <input type="email" name="email" placeholder="Email" autocomplete="off" required>
+                <i class="fas fa-envelope"></i>
+            </div>
+
+            <!-- College -->
+            <div class="input-group animate-slide-up" style="animation-delay: 0.4s;">
+                <input type="text" name="college" placeholder="Which College?" autocomplete="off" required>
+                <i class="fas fa-university"></i>
+            </div>
+
+            <!-- New Password -->
+            <div class="input-group animate-slide-up" style="animation-delay: 0.5s;">
+                <div class="password-field-container">
+                    <input type="password" id="passwordField" name="password" placeholder="New Password" autocomplete="new-password" autocorrect="off" autocapitalize="off" required>
+                    <i class="fas fa-lock input-icon"></i>
+                    <!-- Password toggle will be added by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="input-group animate-slide-up" style="animation-delay: 0.6s;">
+                <div class="password-field-container">
+                    <input type="password" id="confirmPasswordField" name="confirmPassword" placeholder="Confirm Password" autocomplete="new-password" autocorrect="off" autocapitalize="off" required>
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <!-- Password toggle will be added by JavaScript -->
+                </div>
+            </div>
+
+            <button class="signup-button animate-slide-up" style="animation-delay: 0.7s;" type="submit">
+                <span>Create Account</span>
+            </button>
+        </form>
+
+        <div class="error-message" th:if="${error != null}" th:text="${error}"></div>
+        <p class="footer-link animate-fade-in" style="animation-delay: 0.8s;">
+            Already have an account? <a href="/login">Login</a>
+        </p>
+    </div>
+
+    <script th:src="@{/js/animations.js}"></script>
+    <script>
+        // Initialize password toggles when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add staggered animations to form elements
+            const formElements = document.querySelectorAll('.animate-slide-up');
+            formElements.forEach((el, index) => {
+                el.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+            });
+
+            // Add password toggle to password fields
+            initCustomPasswordToggle('passwordField');
+            initCustomPasswordToggle('confirmPasswordField');
+
+            // Define animation functions if not loaded from external file
+            if (typeof addShakeAnimation !== 'function') {
+                window.addShakeAnimation = function(element) {
+                    element.classList.add('shake');
+                    setTimeout(() => {
+                        element.classList.remove('shake');
+                    }, 500);
+                };
+            }
+        });
+
+        // Custom password toggle function for the new design
+        function initCustomPasswordToggle(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const container = passwordInput.parentElement;
+
+            // Check if toggle already exists and remove it to prevent duplicates
+            const existingToggle = container.querySelector('.password-toggle');
+            if (existingToggle) {
+                existingToggle.remove();
+            }
+
+            // Create toggle element
+            const toggle = document.createElement('div');
+            toggle.className = 'password-toggle';
+            toggle.innerHTML = '<i class="fas fa-eye"></i>';
+            toggle.style.opacity = '0.7';
+
+            // Add toggle to container
+            container.appendChild(toggle);
+
+            // Add click event
+            toggle.addEventListener('click', function() {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggle.querySelector('i').className = 'fas fa-eye-slash';
+                    toggle.style.color = 'var(--accent-color)';
+                } else {
+                    passwordInput.type = 'password';
+                    toggle.querySelector('i').className = 'fas fa-eye';
+                    toggle.style.color = 'rgba(255, 255, 255, 0.7)';
+                }
+
+                // Add animation
+                toggle.style.animation = 'togglePop 0.2s forwards';
+                setTimeout(() => {
+                    toggle.style.animation = '';
+                }, 200);
+            });
+        }
+    </script>
+</body>
+</html>

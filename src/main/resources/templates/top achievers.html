@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Top Achievers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #ffffff;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+
+    select {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      color: #fff;
+      font-size: 1rem;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    select option {
+      background-color: #6a5acd;
+      color: white;
+    }
+
+    button {
+      background: linear-gradient(90deg, #38bdf8, #6366f1);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      background: linear-gradient(90deg, #6366f1, #38bdf8);
+    }
+
+    .results {
+      margin-top: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .table th, .table td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .topper-card {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 15px;
+      margin-top: 20px;
+      color: #ffd700;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    <h1><i class="fas fa-trophy"></i> Top Achievers</h1>
+
+    <!-- Department Selection -->
+    <div>
+      <label for="department">Department:</label>
+      <select id="department" onchange="handleDepartmentChange()">
+        <option value="">Select Department</option>
+        <option value="CS">CS</option>
+        <option value="ECE">ECE</option>
+        <option value="EEE">EEE</option>
+        <option value="MECH">MECH</option>
+        <option value="IT">IT</option>
+        <option value="CIVIL">CIVIL</option>
+      </select>
+    </div>
+
+    <!-- Sub Department for CS -->
+    <div id="subDeptContainer" class="hidden">
+      <label for="subDept">Sub-Department:</label>
+      <select id="subDept">
+        <option value="">Select Sub-Department</option>
+      </select>
+    </div>
+
+    <!-- Semester Selection -->
+    <div>
+      <label for="semester">Semester:</label>
+      <select id="semester">
+        <option value="">Select Semester</option>
+        <option value="1-1">1-1</option>
+        <option value="1-2">1-2</option>
+        <option value="2-1">2-1</option>
+        <option value="2-2">2-2</option>
+        <option value="3-1">3-1</option>
+        <option value="3-2">3-2</option>
+        <option value="4-1">4-1</option>
+        <option value="4-2">4-2</option>
+      </select>
+    </div>
+
+    <button onclick="viewTopAchievers()">View Top Achievers</button>
+    <div id="result-area" class="results"></div>
+  </div>
+
+  <script>
+    const subDeptContainer = document.getElementById("subDeptContainer");
+    const subDeptSelect = document.getElementById("subDept");
+    let selectedDept = '';
+
+    function handleDepartmentChange() {
+      const dept = document.getElementById("department").value;
+      subDeptSelect.innerHTML = '<option value="">Select Sub-Department</option>';
+      
+      if (dept === "CS") {
+        subDeptContainer.classList.remove("hidden");
+        ["CSE", "CSD", "CSM"].forEach(sd => {
+          const opt = document.createElement("option");
+          opt.value = sd;
+          opt.textContent = sd;
+          subDeptSelect.appendChild(opt);
+        });
+      } else {
+        subDeptContainer.classList.add("hidden");
+      }
+    }
+
+    async function viewTopAchievers() {
+      const dept = document.getElementById("department").value;
+      const subDept = document.getElementById("subDept").value;
+      const semester = document.getElementById("semester").value;
+      const resultArea = document.getElementById("result-area");
+
+      resultArea.innerHTML = "";
+
+      if (!dept) {
+        resultArea.innerHTML = "<p>Please select a department.</p>";
+        return;
+      }
+
+      let selected = dept === "CS" ? subDept : dept;
+      if (dept === "CS" && !subDept) {
+        resultArea.innerHTML = "<p>Please select a sub-department for CS.</p>";
+        return;
+      }
+      if (!semester) {
+        resultArea.innerHTML = "<p>Please select a semester.</p>";
+        return;
+      }
+
+      // Call backend (update this URL)
+      const url = `http://localhost:8080/api/top-achievers?department=${selected}&semester=${semester}`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.top3 || data.top3.length === 0) {
+          resultArea.innerHTML = `<p>No students found for ${selected} - Semester ${semester}.</p>`;
+          return;
+        }
+
+        let html = `<h2>Top 3 Students (${selected} - Semester ${semester})</h2>
+                    <table class="table">
+                      <tr><th>Rank</th><th>Name</th><th>Roll No</th><th>SGPA</th></tr>`;
+        data.top3.forEach((s, i) => {
+          html += `<tr>
+                     <td>${i + 1}</td>
+                     <td>${s.name}</td>
+                     <td>${s.rollNumber}</td>
+                     <td>${s.sgpa}</td>
+                   </tr>`;
+        });
+        html += `</table>`;
+
+        if (data.overallTopper) {
+          html += `<div class="topper-card">
+                     <h3><i class="fas fa-crown"></i> Overall Topper</h3>
+                     <p>${data.overallTopper.name} (${data.overallTopper.rollNumber}) - ${data.overallTopper.department}</p>
+                     <p><strong>CGPA:</strong> ${data.overallTopper.cgpa}</p>
+                   </div>`;
+        }
+        resultArea.innerHTML = html;
+      } catch (error) {
+        console.error(error);
+        resultArea.innerHTML = "<p>Error fetching data. Please try again.</p>";
+      }
+    }
+  </script>
+</body>
+</html>
