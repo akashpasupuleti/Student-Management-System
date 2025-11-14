@@ -284,8 +284,7 @@ git push origin feature-ui-improvements
 
 # 🔟 License
 
-This project is licensed under the **MIT License** — free for personal and commercial use.
+This project is licensed under the GNU GPL v3 License (NO commercial use allowed).
+See the LICENSE file for details.
 ---
 
-If you want the **CONTRIBUTING.md** also in full copy-paste mode, just tell me!
-```
