@@ -286,5 +286,5 @@ git push origin feature-ui-improvements
 
 This project is licensed under the GNU GPL v3 License (NO commercial use allowed).
 See the LICENSE file for details.
----
+--- 
 
